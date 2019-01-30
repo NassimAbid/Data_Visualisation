@@ -1,13 +1,5 @@
 **Intro**
 
-Creating an Internet application for analysis & visualisation of REF2014 and associated data.
-
-I first researched this hierarchical diagram,
-- https://bl.ocks.org/kerryrodden/766f8f6d31f645c39f488a0befa1e3c8
-
-
----
-
 ## Coursework
 
 This coursework is to produce an interactive internet application for analysis & visualisation of REF 2014 and associated data.
