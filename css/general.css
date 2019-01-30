@@ -1,0 +1,80 @@
+
+
+/*==============================================
+ *
+ * CSS Stylesheet for overall styling
+ *
+ * 04/09/2018	mjc	Created
+ *===============================================*/
+
+
+ html, body {
+	height: 100%;
+	width: 100%;
+	font-family: 'News Cycle', sans-serif;
+	font-size: 14pt;
+}
+h2 {
+  margin-left: 300px;
+  margin-top: 10px;
+}
+
+h3 {
+  margin-left: 920px;
+  margin-top: -750px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex_row {
+  flex-direction: row;
+}
+
+.flex_column {
+  flex-direction: column;
+}
+.flex_no_wrap {
+flex-wrap: nowrap;
+}
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(100px, auto);
+}
+.flex_grow {
+  flex-grow: 1;
+}
+
+#packDiv{
+  max-width: 550px;
+
+}
+
+#legend{
+  margin-top: 100px;
+    max-width: 80px;
+}
+#legendplot{
+  margin-top: 0px;
+    max-width: 80px;
+}
+
+#scatterplot{
+  margin-top: 0px;
+    max-width: 500px;
+    max-height: 300px;
+
+}
+#pie{
+  margin-top: -200px;
+  margin-left: 805px;
+max-width: 330px;
+}
+
+#legendpie{
+  margin-top: -200px;
+  max-width: 80px;
+}

@@ -1,0 +1,123 @@
+<!--------------------------------------------------------------------
+
+   Module: keyed barchart example
+
+   Author: Mike Chantler
+
+   What it does:
+  	Generates some data and renders it in a barchart
+
+   Dependencies
+  	D3.js v4
+
+   Version history
+  	v001	29/08/2018	mjc	Created.
+
+
+---------------------------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Simple barchart with axes</title>
+	<link rel="stylesheet" type="text/css" href="css/barchart-v001.css"/>
+	<link rel="stylesheet" type="text/css" href="css/myBarchartDiv2.css"/>
+	<link rel="stylesheet" type="text/css" href="css/general.css"/>
+	<script type="text/javascript" src="d3/d3.v4.js"></script>
+	<script src="lib/views/barchartSimple_v001-labStart.js"></script>
+</head>
+
+
+<body>
+	<h2>Modular barchart x2</h2>
+	<p></p>
+	<h3>Barchart 1</h3>
+	<div>
+		<button type="button" onclick="sortByValue(dataset1)">Sort</button>
+		<button type="button" onclick="sortByValueR(dataset1)">Reverse Sort</button>
+		<button type="button" onclick="sortByKey(dataset1)">Sort by Key</button>
+	</div>
+	<p></p>
+	<div id=myBarchartDiv1> </div>
+
+	<h3>Barchart 2</h3>
+	<div id=myBarchartDiv2> </div>
+
+
+
+<script type="text/javascript">
+
+'use strict'
+var dataset1 = [
+	{'keyField':'a','dataField':54, 'df2':21, 'highlight':false},
+	{'keyField':'b','dataField':22, 'df2':31, 'highlight':false},
+	{'keyField':'c','dataField':9,  'df2':1,  'highlight':false},
+	{'keyField':'d','dataField':99, 'df2':66, 'highlight':false},
+	{'keyField':'e','dataField':17, 'df2':19, 'highlight':false}
+];
+
+
+var dataset2;
+
+//To create array of separate REFERNCES to dataset elements so
+//we can do independent sorting uncomment next line
+dataset2 = dataset1.map(arrayEntry => arrayEntry );
+
+
+
+//Comment out the next line to implement the above
+//dataset2 = dataset1;
+	var dataField = function(d){return d.df2}
+
+
+
+//Create and load barchart1
+var barchart1 = barchart("#myBarchartDiv1")
+
+.overrideMouseoverFunction(mouseoverCallback)
+.loadAndRenderDataset(dataset1);
+
+
+var barchart2 = barchart("#myBarchartDiv2")
+.overrideDataFieldFunction(dataField)
+	.overrideMouseoverFunction(mouseoverCallback)
+	.loadAndRenderDataset(dataset2);
+
+
+
+//Create and load barchart2 here:
+
+
+
+//===================  FUNCTIONS ====================================
+
+function sortByValue(dataset)	{
+	var sortedDataset = dataset.sort((a,b)=>a.dataField-b.dataField)
+	barchart1.loadAndRenderDataset(sortedDataset);
+}
+function sortByValueR(dataset)	{
+	var sortedDataset = dataset.sort((a,b)=>b.dataField-a.dataField)
+	barchart1.loadAndRenderDataset(sortedDataset);
+}
+function sortByKey(dataset)	{
+	var sortedDataset = dataset.sort((a,b)=>d3.descending(b.keyField,a.keyField))
+	barchart1.loadAndRenderDataset(sortedDataset);
+}
+
+function mouseoutCallback(d){
+	d.highlight = false;
+	barchart1.render()
+	barchart2.render()
+}
+
+function mouseoverCallback(d){
+	d.highlight = true;
+	barchart1.render()
+	barchart2.render()
+}
+
+</script>
+
+</body>
+</html>

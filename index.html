@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>ref14 data: simple tree to bar interaction</title>
+	<link rel="stylesheet" type="text/css" href="css/pack.css"/>
+	<link rel="stylesheet" type="text/css" href="css/scatterplot.css"/>
+	<link rel="stylesheet" type="text/css" href="css/general.css"/>
+	<link rel="stylesheet" type="text/css" href="css/pie.css"/>
+
+	<script type="text/javascript" src="d3/d3.v4.js"></script>
+	<script type="text/javascript" src="lib/views/pie_chart.js"></script>
+	<script src="lib/model/ref14model_v002.js"></script>
+		<script src="lib/views/scatter_plot.js"></script>
+	<script src="lib/views/pack.js"></script>
+</head>
+
+<body>
+
+
+	<div class="flex">
+			<div id="legend" class= "flex_row" ></div>
+		<div id="packDiv"class= "flex_row" ></div>
+
+	<div ID="scatterplot"></div>
+	<div id="legendPlot"></div>
+	</div>
+	<div class="flex">
+	<div id="pie"></div>
+		<div id="legendpie"></div>
+			</div>
+
+<script type="text/javascript">
+"use strict"
+
+var dm1 = modelConstructor(); //Create datamodel object (gives access to methods in ref14model.js etc )
+var dataModel; //shorthand for dm1.model() and declared as nasty outer block variable for easy access from console.
+var scplot; //scatterplot
+var pck; //The hierarchical pack
+var pie1;//declaration of pie
+var uni ="University of Oxford";//default uni
+var subject = "Psychology, Psychiatry and Neuroscience";//default subject
+var topic;//default topic
+//=============== READ DATA FILES ================================
+
+
+d3.queue()
+	.defer(d3.csv, "data/topics/REF2014T30TopicOrder.csv")
+	.defer(d3.csv, "data/290183_REF_Contextual_table_1314_0.csv")
+	.defer(d3.csv, "data/learning-providers-plus.csv")
+	.defer(d3.json, "data/topics/REF2014T30Python.json")
+	.await(initialiseApp)
+
+//======================== MAIN FUNCTION =================================
+//Carries out all initialization and setup
+function initialiseApp(error, ref14data, ref14context , learningProviders, jsonTopicData){
+	//Check data files have loaded
+	if (error) {console . log (" there are errror with loading the data: ", error); return;}
+
+	//Create data model
+	dm1.loadData(ref14data, ref14context , learningProviders, jsonTopicData);
+	dataModel = dm1.model()
+
+	var nest = d3.nest()
+	.key(d=>d.context.regionProvider)
+	.sortKeys(d3.ascending)
+	.key(function(d) { return d["Institution name"]; })
+	.sortKeys(d3.ascending)
+	.rollup(value=>value.length)
+	.entries(dataModel.refEntries);
+
+	pck = packs("#packDiv")
+		.loadAndRenderNestDataset(nest, "REF2014")
+		.appendClickFunction(packClickFunction)
+
+
+
+
+	//Create scatterplot
+	scplot = barchart("#scatterplot")
+		.overrideDataFieldFunction(e => Number(e.environment["4*"])) //Use the 4* assessment as the bar size
+		.overrideKeyFunction(e => Number(e.environment["WordCount"]))
+		.overrideTooltipFunction(function(d){return d.UoAString; })
+		.ovverridegupkeyfield(function(d){return d.DocumentID;})
+		.overrideColorFunction(overrideColorHTML)
+		.overrideyaxislabel("Word Count (Words)")
+		.overridexaxislabel("Percentage of 4* (%)");
+
+
+
+		scplot.createLegend();
+   renderUniversityData(uni);
+
+//create first instance of piechart
+	 pie1 = piechart("#pie");
+	 		pie1.createLegend();
+
+			topic = dataModel.refEntries
+			 .filter(e=>e.UoAString == subject)
+			 .filter(e=>e["Institution name"]==uni);
+
+			 topic =topic[0].environment.topicsAsArray;
+			 pie1.render()
+			pie1.loadAndRenderDataset(topic)
+					.overridelabel(uni)
+					.overridesubject(subject);
+
+}
+
+
+//==================== HELPER FUNCTIONS =========================================
+//function used for overriding the colors of each circle in the plot to the main panel css.
+function overrideColorHTML(data){
+	data = data["Main panel"];
+	var color ="blue";
+	if (data == "A"){
+		color = "A";
+	}
+	if ( data =="B"){
+		color ="B";
+	}
+	if( data =="C"){
+		color ="C";
+	}
+	if( data =="D"){
+		color ="D";
+	}
+	return color;
+}
+
+//pack click function to passthrough the data to the plotgraph
+function packClickFunction(d){
+	console.log(d);
+	if (d.height == 0) {
+		console.log("tree click, d.height, d = ", d.data.key)
+		renderUniversityData(d.data.key);
+
+	}
+
+}
+// this is for setting highlighting the plot to true in the pack, it highlights all universities that have the subject highlighted
+function highlightsubjectPlottrue(string){
+	console.log(string);
+	var institutionClassesToHighlight=dataModel.refEntries
+	 .filter(e=>e.UoAString == string).map(e=> e["Institution name"]);
+	 	console.log(institutionClassesToHighlight);
+		for(var i= 0; i<institutionClassesToHighlight.length; i++){
+			var keys= ".key--"+institutionClassesToHighlight[i].replace(/[\W]+/g, "_").toLowerCase();
+			console.log(keys);
+				d3.select(keys).classed("highlight",true)
+		}
+
+}
+// this is for setting highlighting the plot to false
+function highlightsubjectPlotfalse(string){
+	var institutionClassesToHighlight=dataModel.refEntries
+	 .filter(e=>e.UoAString == string).map(e=> e["Institution name"]);
+		console.log(institutionClassesToHighlight);
+		for(var i= 0; i<institutionClassesToHighlight.length; i++){
+			var keys= ".key--"+institutionClassesToHighlight[i].replace(/[\W]+/g, "_").toLowerCase();
+			d3.select(keys).classed("highlight",false)
+		}
+
+}
+// this is for setting highlighting the pie to true in the pack, it highlights all universities with the selecteed subject
+//and has a higher weight in the topic as array highlighted.
+function highlightsubjectpietopacktrue(data, subject){
+
+	for(var i= 0; i<dataModel.refEntries.length; i++){
+	for(var j= 0; j<dataModel.refEntries[0].environment.topicsAsArray.length; j++){
+ if(dataModel.refEntries[i].UoAString ==subject&&
+	 dataModel.refEntries[i].environment.topicsAsArray[j].topicAs3words==data.key &&
+	 dataModel.refEntries[i].environment.topicsAsArray[j].weight>data.value){
+	var keys= ".key--"+dataModel.refEntries[i]["Institution name"].replace(/[\W]+/g, "_").toLowerCase();
+	d3.select(keys).classed("highlight",true);
+ }
+
+ }
+}
+
+
+}
+// this is for setting highlighting the pie to false in the pack.
+function highlightsubjectpietopackfalse(data, subject){
+
+
+	for(var i= 0; i<dataModel.refEntries.length; i++){
+	for(var j= 0; j<dataModel.refEntries[i].environment.topicsAsArray.length; j++){
+		if(dataModel.refEntries[i].UoAString ==subject&&
+		dataModel.refEntries[i].environment.topicsAsArray[j].topicAs3words==data.key
+		&& dataModel.refEntries[i].environment.topicsAsArray[j].weight>data.value){
+	 	var keys= ".key--"+dataModel.refEntries[i]["Institution name"].replace(/[\W]+/g, "_").toLowerCase();
+	d3.select(keys).classed("highlight",false);
+ }
+
+ }
+}
+
+}
+
+// this is for setting highlighting the pie to true in the plot, it highlights subjects
+//that have a higher weight in the topic as array highlighted.
+function highlightsubjectpietoplottrue(data,university){
+
+for(var i= 0; i<dataModel.refEntries.length; i++){
+for(var j= 0; j<dataModel.refEntries[i].environment.topicsAsArray.length; j++){
+if(dataModel.refEntries[i]["Institution name"] ==university
+&&dataModel.refEntries[i].environment.topicsAsArray[j].topicAs3words==data.key
+&& dataModel.refEntries[i].environment.topicsAsArray[j].weight>data.value){
+	var keys= ".key--"+dataModel.refEntries[i].UoAString.replace(/[\W]+/g, "_").toLowerCase();
+		d3.select(keys).classed("highlight",true).attr("r",6);
+}
+}
+}
+}
+
+// this is for setting highlighting the pie to false in the plot
+function highlightsubjectpietoplotfalse(data,university){
+
+for(var i= 0; i<dataModel.refEntries.length; i++){
+for(var j= 0; j<dataModel.refEntries[i].environment.topicsAsArray.length; j++){
+if(dataModel.refEntries[i]["Institution name"] === university
+&&dataModel.refEntries[i].environment.topicsAsArray[j].topicAs3words==data.key
+&& dataModel.refEntries[i].environment.topicsAsArray[j].weight>data.value){
+	var keys= ".key--"+dataModel.refEntries[i].UoAString.replace(/[\W]+/g, "_").toLowerCase();
+	d3.select(keys).classed("highlight",false).attr("r",3.5);
+}
+}
+}
+}
+
+// this is for setting highlighting the pack to true in the pie, it highlights the university
+//that is loaded in the pie
+function highlightpacktopietrue(d){
+var university = d.data.key;
+console.log(university);
+		var keys= ".key--"+university.replace(/[\W]+/g, "_").toLowerCase();
+			d3.selectAll(keys).classed("piehighlight",true)
+
+
+
+}
+// this is for setting highlighting the pack to false in the pie,
+function highlightpacktopiefalse(d){
+var university = d.data.key;
+		var keys= ".key--"+university.replace(/[\W]+/g, "_").toLowerCase();
+			d3.selectAll(keys).classed("piehighlight",false)
+
+
+
+}
+//click function used to pass data into the pie
+function plotClickFunction(d){
+	var topicAsArray =d.environment.topicsAsArray;
+	 var university = d["Institution name"];
+	 var subject =d.UoAString;
+	 pie1.render()
+	 pie1.loadAndRenderDataset(topicAsArray)
+	 		.overridelabel(university)
+	 		.overridesubject(subject);
+
+
+
+}
+
+//renders pie and passes information.
+//Need to refactor piecode to be more modular
+
+function renderUniversityData(university){
+	//Generate set of sorted REF entries for this university
+	var sc1Data = dataModel.refEntries
+		.filter(e => e["Institution name"] == university)
+		.sort((a, b) => d3.ascending(
+			a["UoAString with Multiple submission letter appended"],
+			b["UoAString with Multiple submission letter appended"]
+		))
+
+	//Render the scaterplot
+	scplot.loadAndRenderDataset(sc1Data)
+
+}
+
+
+
+
+
+
+</script>
+</body>
+</html>

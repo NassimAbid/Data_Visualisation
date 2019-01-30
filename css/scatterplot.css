@@ -1,0 +1,52 @@
+
+
+/*Watch out for the spaces below (space = descendant relationship, no-space = AND) */
+/* note '.' denotes class, '#' denotes ID */
+
+*   {
+	font-family: sans-serif;
+
+}
+.barchart .dot {
+  stroke: gold  ;
+
+}
+
+.barchart .dot .highlight{
+  	fill: yellow;
+    stroke-width: 1.0px;
+}
+.Uni{
+  	font: 10px sans-serif;
+}
+
+.A{
+	fill:#42d4f4;
+}
+
+.B{
+	fill:#aaffc3;
+}
+.C{
+	fill:#f58231;
+}
+
+.D{
+	fill:#808000;
+
+}
+
+
+.barchart .focusOn{
+	fill: black;
+	font: 12px sans-serif;
+  opacity: 1;
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+circle.highlight{
+	 fill:#D40E22;
+	 stroke: steelblue;
+	 stroke-width: -5.0px;
+}

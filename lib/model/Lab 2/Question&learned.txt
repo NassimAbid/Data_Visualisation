@@ -1,0 +1,14 @@
+I learned how to method chain and manipulate classes
+
+myObject2 .overrideArithmentFunction1(d => d*d) 
+
+this is an example of an instance of a class being manipulated.
+
+
+var myObject2 = myClass();
+
+why is there a ";" here but not here?? ** ASK LECTURER
+
+cubeArrayElements = myClass() 
+		.overrideArithmentFunction1(d=>d*d*d) 
+		.loadAndProcessData([1,2,3,4,"z"]); 

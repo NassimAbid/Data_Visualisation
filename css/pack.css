@@ -1,0 +1,122 @@
+/*CSS file for d3 trees*/
+* {
+	font-family: sans-serif;
+}
+
+/* Group styling*/
+.cssClassNode {
+	cursor: pointer;
+}
+
+
+.label {
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+}
+/* Link styling*/
+.cssClassLink {
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 1.5px;
+	pointer-events: none;
+}
+
+/* Circle styling*/
+.cssClassNode .leafNode circle {
+	stroke: steelblue;
+	opacity : 0.8;
+	stroke-width: 2.5px;
+}
+
+.intermediateNodeNEAS circle{
+		fill: #CD6155;
+}
+.intermediateNodeEAST circle{
+		fill: #E74C3C;
+}
+.intermediateNodeWALE circle{
+		fill: #9B59B6;
+}
+.intermediateNodeNIRE circle{
+		fill: #2980B9;
+}
+.intermediateNodeSCOT circle{
+		fill: #3498DB;
+}
+.intermediateNodeSWES circle{
+		fill: #17A589;
+}
+.intermediateNodeWMID circle{
+		fill: #bfef45;
+}
+.intermediateNodeEMID circle{
+		fill: #27AE60;
+}
+.intermediateNodeYORH circle{
+		fill: #F4D03F;
+}
+.intermediateNodeNWES circle{
+		fill: #F5B041;
+}
+.intermediateNodeSEAS circle{
+		fill: #E67E22;
+}
+.intermediateNodeLOND circle{
+		fill: #D40E22;
+}
+.leafNode circle {
+	opacity: 0.8;
+	fill: white;
+	stroke: steelblue;
+	stroke-width: 1.5px;
+}
+.rootNode circle {
+	fill:  white;
+}
+
+/* Text styling*/
+.cssClassNode text {
+	fill: black;
+	font: 0px sans-serif;
+
+}
+
+.leafNode > circle.hovercolor {
+	 fill:#ffd8b1;
+	 stroke-width: 5.0px;
+	 opacity: 1;
+
+}
+
+
+.cssClassNode.rootNode text{
+	text-anchor: start;
+    transform: translate(-4px, -12px);
+}
+.cssClassNode.intermediateNode text{
+	text-anchor: middle;
+    transform: translate(0px, -12px);
+}
+.cssClassNode.leafNode text{
+	text-anchor: start;
+    transform: translate(-18px, 2px);
+}
+
+.cssClassNode.leafNode.bigtext text{
+	fill: black;
+	font: 15px sans-serif;
+	text-anchor: middle;
+    transform: translate(-60px, 2px);
+		text-shadow: 0 1px 0 black;
+}
+
+.cssClassNode.highlight text {
+	fill: black;
+	font: 30px sans-serif;
+}
+
+ .leafNode > circle.highlight {
+		fill:#ffd8b1;
+		stroke-width: 5.0px;
+}

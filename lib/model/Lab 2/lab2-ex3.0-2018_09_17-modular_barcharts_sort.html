@@ -1,0 +1,109 @@
+<!--------------------------------------------------------------------
+
+   Module: keyed barchart example with transitions
+
+   Author: Mike Chantler
+
+   What it does:
+  	Generates some data and renders it in a barchart
+
+   Dependencies
+  	D3.js v4
+
+   Version history
+  	v001	16/03/2017	mjc	Created.
+
+---------------------------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Simple barchart with axes</title>
+	<link rel="stylesheet" type="text/css" href="css/barchart-v001.css"/>
+	<script type="text/javascript" src="d3/d3.v4.js"></script>
+	<script src="lib/views/barchartWithAxes_d3v4_v002.js"></script>
+</head>
+
+<body>
+	<h2>Modular barchart x 2</h2>
+	<p></p>
+	<div>
+			<button type="button" onclick="bc1.sortByDataField()">Sort</button>
+			<button type="button" onclick="bc1.reverseSortByDataField()">Reverse Sort</button>
+			<button type="button" onclick="bc1.sortByKey()">Sort by Key</button>
+	</div>
+	<p></p>
+	<div id=b1> </div>
+	<div>
+			<button type="button" onclick="bc2.sortByDataField()">Sort</button>
+			<button type="button" onclick="bc2.reverseSortByDataField()">Reverse Sort</button>
+			<button type="button" onclick="bc2.sortByKey()">Sort by Key</button>
+	</div>
+	<div id=b2> </div>
+
+<script type="text/javascript">
+'use strict' //This catches acidental global declarations
+
+	var dataset = [
+		{'keyField':'a','dataField1':54,'dataField2':100, 'highlight':false},
+		{'keyField':'b','dataField1':22,'dataField2':34, 'highlight':false},
+		{'keyField':'c','dataField1':9,'dataField2':45, 'highlight':false},
+		{'keyField':'d','dataField1':200,'dataField2':10, 'highlight':false},
+		{'keyField':'e','dataField1':17,'dataField2':22, 'highlight':false},
+		{'keyField':'aa','dataField1':26,'dataField2':64, 'highlight':false},
+		{'keyField':'bb','dataField1':54,'dataField2':44, 'highlight':false},
+		{'keyField':'cc','dataField1':42,'dataField2':92, 'highlight':false},
+		{'keyField':'dd','dataField1':160,'dataField2':120, 'highlight':false},
+		{'keyField':'ee','dataField1':75,'dataField2':140, 'highlight':false},
+	];
+
+	//create barchart instance 1, customise and add its svg to div #b1
+	var bc1 = barchart("#b1")
+		.overrideKeyFunction(d=>d.keyField)
+		.overrideDataFieldFunction(d=>d.dataField1)
+		.overrideTooltipFunction(tooltip)
+		.overrideMouseOverFunction(mouseOverFunction)
+		.overrideMouseOutFunction(mouseOutFunction)
+		.yAxisIndent(40);
+
+	//Likewise second barchart
+	var bc2 = barchart("#b2")
+		.overrideKeyFunction(d=>d.keyField)
+		.overrideDataFieldFunction(d=>d.dataField2)
+		.overrideTooltipFunction(tooltip)
+		.overrideMouseOverFunction(mouseOverFunction)
+		.overrideMouseOutFunction(mouseOutFunction)
+		.yAxisIndent(40);
+
+	//Load the data
+	bc1.loadAndRenderDataset(dataset);
+	bc2.loadAndRenderDataset(dataset);
+
+
+
+	//======================== FUNCTIONS ==================================//
+
+	function mouseOverFunction (d,i){
+		d.highlight = true;
+		//A bit dirty, but we will simply:
+		d3.selectAll(".key--"+d.keyField) //select all DOM elements with class "key--<d.keyField>"
+			.classed("highlight", true)   //add "highlight" class to selected DOM elements
+	}
+
+	function mouseOutFunction (d,i){
+		d.highlight = false;
+		//A bit dirty, but we will simply:
+		d3.selectAll(".key--"+d.keyField) //select all DOM elements with class "key--<d.keyField>"
+			.classed("highlight", false)  //remove "highlight" class to selected DOM elements
+	}
+
+	function tooltip(d){
+		return "d="+d.dataField1+", key="+d.keyField
+	}
+
+
+	</script>
+
+</body>
+</html>
